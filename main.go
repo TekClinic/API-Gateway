@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
@@ -131,6 +132,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// setup CORS middleware
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowHeaders:    []string{"Authorization"},
+	}))
 
 	router.GET("/patients/me", fetchPatientData(patientsService))
 
