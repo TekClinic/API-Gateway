@@ -2,56 +2,20 @@ package main
 
 import (
 	"errors"
-	"fmt"
+	ms "github.com/TekClinic/MicroService-Lib"
 	"github.com/gin-contrib/cors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 
-	patientpb "github.com/TekClinic/Patients-MicroService/patients_protobuf"
+	patients "github.com/TekClinic/Patients-MicroService/patients_protobuf"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
-
-type Service struct {
-	host string
-	port string
-}
-
-func (s Service) getAddr() string {
-	return s.host + ":" + s.port
-}
-
-func getRequiredEnv(key string) (string, error) {
-	value, set := os.LookupEnv(key)
-	if !set {
-		return "", errors.New(key + " environment variable is missing")
-	}
-	return value, nil
-}
-
-func getOptionalEnv(key string, def string) string {
-	value, set := os.LookupEnv(key)
-	if set {
-		return value
-	}
-	return def
-}
-
-func fetchServiceParameters(serviceName string) (*Service, error) {
-	host, err := getRequiredEnv(fmt.Sprintf("MS_%s_HOST", strings.ToUpper(serviceName)))
-	if err != nil {
-		return nil, err
-	}
-
-	port := getOptionalEnv(fmt.Sprintf("MS_%s_PORT", strings.ToUpper(serviceName)), "9090")
-	return &Service{host: host, port: port}, nil
-}
 
 func extractBearerToken(header string) (string, error) {
 	if header == "" {
@@ -66,7 +30,7 @@ func extractBearerToken(header string) (string, error) {
 	return jwtToken[1], nil
 }
 
-func fetchPatientData(patientsService *Service) gin.HandlerFunc {
+func fetchPatientData(patientsService *ms.Service) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authToken, err := extractBearerToken(ctx.GetHeader("Authorization"))
 
@@ -85,7 +49,7 @@ func fetchPatientData(patientsService *Service) gin.HandlerFunc {
 		}
 
 		// Authenticate auth_token with auth-microservice
-		conn, err := grpc.Dial(patientsService.getAddr(),
+		conn, err := grpc.Dial(patientsService.GetAddr(),
 			grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -94,9 +58,9 @@ func fetchPatientData(patientsService *Service) gin.HandlerFunc {
 			return
 		}
 		defer conn.Close()
-		client := patientpb.NewPatientsServiceClient(conn)
+		client := patients.NewPatientsServiceClient(conn)
 
-		patient, err := client.GetMe(ctx, &patientpb.MeRequest{Token: authToken})
+		patient, err := client.GetMe(ctx, &patients.MeRequest{Token: authToken})
 		if err != nil {
 			if status.Code(err) == codes.Unauthenticated {
 				ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -127,12 +91,16 @@ func fetchPatientData(patientsService *Service) gin.HandlerFunc {
 }
 
 func main() {
-	router := gin.Default()
-	patientsService, err := fetchServiceParameters("patients")
+	router := gin.New()
+	patientsService, err := ms.FetchServiceParameters("patients")
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// enable logging
+	router.Use(gin.Logger())
+	// recover in case of panic
+	router.Use(gin.Recovery())
 	// setup CORS middleware
 	router.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
