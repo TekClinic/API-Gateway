@@ -13,7 +13,7 @@ const tokenKey = "token"
 func extractBearerToken(ctx *gin.Context) (string, error) {
 	header := ctx.GetHeader("Authorization")
 	if header == "" {
-		return "", errors.New("missed authorization token")
+		return "", errors.New("bearer token is missing")
 	}
 
 	parts := strings.Split(header, " ")
@@ -32,14 +32,7 @@ func AuthRequired() gin.HandlerFunc {
 		jwtToken, err := extractBearerToken(ctx)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-
-		if jwtToken == "" {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "bearer token is missing",
+				"message": err.Error(),
 			})
 			return
 		}
