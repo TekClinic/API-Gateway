@@ -1,34 +1,19 @@
 package main
 
 import (
-	"errors"
+	"github.com/TekClinic/API-Gateway/middlewares"
 	ms "github.com/TekClinic/MicroService-Lib"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
 	"net/http"
-	"strings"
-
-	"github.com/gin-gonic/gin"
 
 	patients "github.com/TekClinic/Patients-MicroService/patients_protobuf"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
-
-func extractBearerToken(header string) (string, error) {
-	if header == "" {
-		return "", errors.New("bad header value given")
-	}
-
-	jwtToken := strings.Split(header, " ")
-	if len(jwtToken) != 2 || jwtToken[0] != "Bearer" {
-		return "", errors.New("incorrectly formatted authorization header")
-	}
-
-	return jwtToken[1], nil
-}
 
 func fetchPatientData(patientsService *ms.Service) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -91,11 +76,12 @@ func fetchPatientData(patientsService *ms.Service) gin.HandlerFunc {
 }
 
 func main() {
-	router := gin.New()
 	patientsService, err := ms.FetchServiceParameters("patients")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	router := gin.New()
 
 	// enable logging
 	router.Use(gin.Logger())
@@ -106,6 +92,8 @@ func main() {
 		AllowAllOrigins: true,
 		AllowHeaders:    []string{"Authorization"},
 	}))
+	// require authorization on all endpoints
+	router.Use(middlewares.AuthRequired())
 
 	router.GET("/patients/me", fetchPatientData(patientsService))
 
