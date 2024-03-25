@@ -1,7 +1,7 @@
 github.com/TekClinic/MicroService-Lib v0.1.1 h1:z8h7tTyGagAcCGiotIU90MK54KPiaqQEzvTXQoVyMQE=
 github.com/TekClinic/MicroService-Lib v0.1.1/go.mod h1:E+H5ws1krOZ8bJT1DtbZVUplxAJybdWXfVeZbpeaeqQ=
-github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.1 h1:oTQWy7keTUY3271WCB+Gk/3SW7/sqF/GJbez6eEn2TA=
-github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.1/go.mod h1:243J6vfVnJDTZQTPHYKOepzWuE05xyrIJMfOcBUR+V0=
+github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.2 h1:ONjTJbAtIu11CKuAcgFWVUPJq8ZccJmR/uRR2AXDQ2w=
+github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.2/go.mod h1:243J6vfVnJDTZQTPHYKOepzWuE05xyrIJMfOcBUR+V0=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.10.0-rc/go.mod h1:ElCzW+ufi8qKqNW0FY314xriJhyJhuoJ3gFZdAHF7NM=
 github.com/bytedance/sonic v1.11.3 h1:jRN+yEjakWh8aK5FzrciUHG8OFXK+4/KrAX/ysEtHAA=

@@ -8,11 +8,14 @@ WORKDIR /app
 # Copy the source code
 COPY . .
 
+# Download git
+RUN apk add --no-cache git
+
 # Download Go modules
 RUN go mod download
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /api-gateway -buildvcs=false
+RUN CGO_ENABLED=0 GOOS=linux go build -o /api-gateway
 
 FROM golang:1.22-alpine
 

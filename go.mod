@@ -4,9 +4,12 @@ go 1.22.0
 
 require (
 	github.com/TekClinic/MicroService-Lib v0.1.1
-	github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.1
+	github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.2
 	github.com/gin-contrib/cors v1.7.1
+	github.com/gin-contrib/location v1.0.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/sa-/slicefunk v0.1.4
+	google.golang.org/grpc v1.61.0
 )
 
 require (
@@ -15,7 +18,6 @@ require (
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/coreos/go-oidc/v3 v3.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
-	github.com/gin-contrib/location v1.0.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -31,7 +33,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.0 // indirect
-	github.com/sa-/slicefunk v0.1.4 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.7.0 // indirect
@@ -42,7 +43,6 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231106174013-bbf56f31fb17 // indirect
-	google.golang.org/grpc v1.61.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apimachinery v0.29.2 // indirect

@@ -365,6 +365,7 @@ components:
           format: uri
     PatientBase:
       required:
+      - birth_date
       - name
       - personal_id
       type: object
@@ -381,9 +382,9 @@ components:
           type: string
           description: gender of patient.
           example: male
-          default: not specified
+          default: unspecified
           enum:
-          - not specified
+          - unspecified
           - male
           - female
         phone_number:
@@ -406,6 +407,7 @@ components:
           format: date
           example: 2000-07-21
         emergency_contacts:
+          maxItems: 10
           type: array
           description: phone numbers of emergency contacts.
           items:
@@ -492,7 +494,7 @@ components:
         phone:
           type: string
           description: "phone number of patient, that includes country code."
-          example: "972603159352"
+          example: +972603159352
     Doctor:
       required:
       - active
@@ -523,14 +525,14 @@ components:
           type: string
           description: gender of the doctor.
           example: male
-          default: not specified
+          default: unspecified
           enum:
-          - not specified
+          - unspecified
           - male
           - female
         phone_number:
           type: string
-          description: "phone number of doctor., that includes country code."
+          description: "phone number of doctor, that includes country code."
           example: +972501131591
         specialities:
           maxItems: 30
