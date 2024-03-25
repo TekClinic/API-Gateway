@@ -1,11 +1,23 @@
 package main
 
 import (
+	"log"
+
+	ms "github.com/TekClinic/MicroService-Lib"
+	"github.com/gin-contrib/location"
+
 	"github.com/TekClinic/API-Gateway/middlewares"
 	"github.com/TekClinic/API-Gateway/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"log"
+)
+
+const (
+	envURIScheme = "URI_SCHEME"
+	envURIHost   = "URI_HOST"
+
+	defaultURIScheme = "http"
+	defaultURIHost   = "localhost"
 )
 
 func main() {
@@ -19,6 +31,11 @@ func main() {
 	router.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 		AllowHeaders:    []string{"Authorization"},
+	}))
+	// setup middleware to discover hostname
+	router.Use(location.New(location.Config{
+		Scheme: ms.GetOptionalEnv(envURIScheme, defaultURIScheme),
+		Host:   ms.GetOptionalEnv(envURIHost, defaultURIHost),
 	}))
 	// require authorization on all endpoints
 	router.Use(middlewares.AuthRequired())
