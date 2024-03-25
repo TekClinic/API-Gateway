@@ -21,7 +21,7 @@ const (
 )
 
 // CreateNamedAPIResourceList creates NamedAPIResourceList for the given request.
-func CreateNamedAPIResourceList(ctx *gin.Context,
+func CreateNamedAPIResourceList(ctx *gin.Context, resourceName string,
 	skip int32, limit int32, count int32, ids []int32) schemas.NamedAPIResourceList {
 	previous, next := GetPaginationLinks(ctx, skip, limit, count)
 	return schemas.NamedAPIResourceList{
