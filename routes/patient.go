@@ -108,6 +108,52 @@ func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 	}
 }
 
+func addPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// fetch params from the body
+		var params schemas.PatientBase
+		err := ctx.ShouldBindJSON(&params)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
+				Message: err.Error(),
+			})
+			return
+		}
+
+		// call patient microservice
+		response, err := service.CreatePatient(ctx, &patients.CreatePatientRequest{
+			Token: ctx.GetString(middlewares.TokenKey),
+			Name:  params.Name,
+			PersonalID: &patients.Patient_PersonalID{
+				Id:   params.PersonalID.ID,
+				Type: params.PersonalID.Type,
+			},
+			Gender:      patients.Patient_Gender(patients.Patient_Gender_value[strings.ToUpper(params.Gender)]),
+			PhoneNumber: params.PhoneNumber,
+			Languages:   params.Languages,
+			BirthDate:   params.BirthDate,
+			EmergencyContacts: sf.Map(params.EmergencyContacts,
+				func(contact schemas.EmergencyContact) *patients.Patient_EmergencyContact {
+					return &patients.Patient_EmergencyContact{
+						Name:      contact.Name,
+						Closeness: contact.Closeness,
+						Phone:     contact.Phone,
+					}
+				}),
+			ReferredBy:  params.ReferredBy,
+			SpecialNote: params.SpecialNote,
+		})
+		if err != nil {
+			HandleGRPCError(err, ctx)
+			return
+		}
+
+		ctx.JSON(http.StatusCreated, schemas.IDHolder{
+			ID: response.GetId(),
+		})
+	}
+}
+
 func RegisterPatientRoutes(router *gin.Engine) {
 	patientsService, err := ms.FetchServiceParameters(resourceName)
 	if err != nil {
@@ -118,8 +164,7 @@ func RegisterPatientRoutes(router *gin.Engine) {
 		log.Fatal(err)
 	}
 	client := patients.NewPatientsServiceClient(conn)
-
 	router.GET("/patient", getPatients(client))
-	router.POST("/patient", UnImplemented())
+	router.POST("/patient", addPatient(client))
 	router.GET("/patient/:id", getPatient(client))
 }

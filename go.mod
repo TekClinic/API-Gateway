@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/TekClinic/MicroService-Lib v0.1.1
-	github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.2
+	github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.3
 	github.com/gin-contrib/cors v1.7.1
 	github.com/gin-contrib/location v1.0.0
 	github.com/gin-gonic/gin v1.9.1
