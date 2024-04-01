@@ -25,7 +25,7 @@ type PatientIDHolder struct {
 	ID int32 `json:"id"`
 }
 
-// PatientIDHolder implements PatientIDHolder schema.
+// AssignPatientIDHolder PatientIDHolder implements PatientIDHolder schema.
 type AssignPatientIDHolder struct {
 	ID int32 `json:"patient_id"`
 }
@@ -143,7 +143,7 @@ func getAppointment(service appointments.AppointmentsServiceClient) gin.HandlerF
 	}
 }
 
-func createAppontment(service appointments.AppointmentsServiceClient) gin.HandlerFunc {
+func createAppointment(service appointments.AppointmentsServiceClient) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var params schemas.AppointmentBase
 		err := ctx.ShouldBindJSON(&params)
@@ -264,7 +264,7 @@ func deleteAppointment(service appointments.AppointmentsServiceClient) gin.Handl
 		}
 
 		// call appointment microservice
-		response, err := service.DeleteAppointment(ctx, &appointments.DeleteAppointmentRequest{
+		_, err = service.DeleteAppointment(ctx, &appointments.DeleteAppointmentRequest{
 			Token:         ctx.GetString(middlewares.TokenKey),
 			AppointmentId: params.ID,
 		})
@@ -273,10 +273,7 @@ func deleteAppointment(service appointments.AppointmentsServiceClient) gin.Handl
 			return
 		}
 
-		ctx.JSON(http.StatusOK,
-			DeletedMessageHolder{
-				Message: response.GetMessage(),
-			})
+		ctx.JSON(http.StatusOK, gin.H{})
 	}
 }
 
@@ -292,7 +289,7 @@ func RegisterAppointmentRoutes(router *gin.Engine) {
 	client := appointments.NewAppointmentsServiceClient(conn)
 
 	router.GET("/appointment/:id", getAppointment(client))
-	router.POST("/appointment", createAppontment(client))
+	router.POST("/appointment", createAppointment(client))
 	router.GET("/appointment", getAppointments(client))
 	router.PUT("/appointment/:id/patient", assignPatient(client))
 	router.DELETE("/appointment/:id/patient", removePatient(client))

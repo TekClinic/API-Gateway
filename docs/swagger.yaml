@@ -270,6 +270,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Appointment'
+    delete:
+      tags:
+      - Appointment
+      description: deletes an appointment
+      operationId: deleteAppointment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: appointment delete successfully
   /appointment/{id}/patient:
     put:
       tags:
