@@ -3,13 +3,14 @@ module github.com/TekClinic/API-Gateway
 go 1.22.0
 
 require (
+	github.com/TekClinic/Appointments-MicroService/appointments_protobuf v0.1.2
 	github.com/TekClinic/MicroService-Lib v0.1.1
 	github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.3
 	github.com/gin-contrib/cors v1.7.1
 	github.com/gin-contrib/location v1.0.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/sa-/slicefunk v0.1.4
-	google.golang.org/grpc v1.61.0
+	google.golang.org/grpc v1.62.1
 )
 
 require (
@@ -38,11 +39,11 @@ require (
 	golang.org/x/arch v0.7.0 // indirect
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/net v0.22.0 // indirect
-	golang.org/x/oauth2 v0.14.0 // indirect
+	golang.org/x/oauth2 v0.16.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20231106174013-bbf56f31fb17 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apimachinery v0.29.2 // indirect
