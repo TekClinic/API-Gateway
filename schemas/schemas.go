@@ -57,3 +57,19 @@ type Patient struct {
 	Active bool  `json:"active"`
 	Age    int32 `json:"age"`
 }
+
+// PatientBase implements PatientBase schema.
+type DoctorBase struct {
+	Name         string `json:"name" binding:"required,min=1,max=100"`
+	Gender       string `json:"gender" binding:"oneof='unspecified' male female"`
+	PhoneNumber  string `json:"phone_number" binding:"omitempty,e164"`
+	Specialities string `json:"specialities" binding:"max=100"`
+	SpecialNote  string `json:"special_note" binding:"max=500"`
+}
+
+// Patient implements Patient schema.
+type Doctor struct {
+	DoctorBase
+	ID     int32 `json:"id"`
+	Active bool  `json:"active"`
+}
