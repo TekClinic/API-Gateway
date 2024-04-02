@@ -51,7 +51,7 @@ func getDoctors(service doctors.DoctorServiceClient) gin.HandlerFunc {
 }
 
 type DoctorParams struct {
-	ID int32 `uri:"id" binding:"required"`
+	ID int64 `uri:"id" binding:"required"`
 }
 
 func getDoctor(service doctors.DoctorServiceClient) gin.HandlerFunc {
