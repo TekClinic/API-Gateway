@@ -11,7 +11,6 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/sa-/slicefunk v0.1.4
 	google.golang.org/grpc v1.62.1
-
 )
 
 require (
