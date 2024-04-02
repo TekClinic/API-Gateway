@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	ms "github.com/TekClinic/MicroService-Lib"
 	"github.com/gin-contrib/location"
@@ -18,6 +19,7 @@ const (
 
 	defaultURIScheme = "http"
 	defaultURIHost   = "localhost"
+	preflightMaxAge  = 12 * time.Hour
 )
 
 func main() {
@@ -30,7 +32,9 @@ func main() {
 	// setup CORS middleware
 	router.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
-		AllowHeaders:    []string{"Authorization"},
+		AllowHeaders:    []string{"Authorization", "Origin", "Content-Length", "Content-Type"},
+		AllowMethods:    []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
+		MaxAge:          preflightMaxAge,
 	}))
 	// setup middleware to discover hostname
 	router.Use(location.New(location.Config{
