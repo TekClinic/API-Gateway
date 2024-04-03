@@ -73,3 +73,17 @@ type Doctor struct {
 	ID     int32 `json:"id"`
 	Active bool  `json:"active"`
 }
+
+// MedicalRecordBase implements MedicalRecordBase schema.
+type MedicalRecordBase struct {
+	PatientID int32  `json:"patient_id" binding:"required"`
+	DoctorID  int32  `json:"doctor_id" binding:"required"`
+	Date      string `json:"date" binding:"required,datetime=2006-01-02"`
+	Note      string `json:"note" binding:"max=500"`
+}
+
+// MedicalRecord implements MedicalRecord schema.
+type MedicalRecord struct {
+	MedicalRecordBase
+	ID int32 `json:"id"`
+}

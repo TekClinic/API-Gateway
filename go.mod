@@ -3,6 +3,7 @@ module github.com/TekClinic/API-Gateway
 go 1.22.0
 
 require (
+	github.com/TekClinic/Medical-Records-Microservice/MR_protobuf v0.1.1
 	github.com/TekClinic/Doctors-MicroService/doctors_protobuf v0.1.1
 	github.com/TekClinic/MicroService-Lib v0.1.1
 	github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.3
@@ -14,6 +15,7 @@ require (
 )
 
 require (
+	github.com/TekClinic/Medical-Records-Microservice/MR_protobuf v0.0.0-20240402155158-03ac3de57dcb
 	github.com/bytedance/sonic v1.11.3 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
