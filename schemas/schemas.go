@@ -72,6 +72,7 @@ type Doctor struct {
 	DoctorBase
 	ID     int32 `json:"id"`
 	Active bool  `json:"active"`
+}
 // AppointmentBase implements AppointmentBase schema.
 type AppointmentBase struct {
 	PatientID int32  `json:"patient_id"`
