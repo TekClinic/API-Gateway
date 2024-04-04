@@ -3,7 +3,7 @@ module github.com/TekClinic/API-Gateway
 go 1.22.0
 
 require (
-	github.com/TekClinic/Doctors-MicroService/doctors_protobuf v0.1.1
+	github.com/TekClinic/Appointments-MicroService/appointments_protobuf v0.1.2
 	github.com/TekClinic/MicroService-Lib v0.1.1
 	github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.3
 	github.com/gin-contrib/cors v1.7.1
@@ -43,7 +43,7 @@ require (
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240401170217-c3f982113cda // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apimachinery v0.29.2 // indirect

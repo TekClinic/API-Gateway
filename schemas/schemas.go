@@ -72,4 +72,22 @@ type Doctor struct {
 	DoctorBase
 	ID     int32 `json:"id"`
 	Active bool  `json:"active"`
+// AppointmentBase implements AppointmentBase schema.
+type AppointmentBase struct {
+	PatientID int32  `json:"patient_id"`
+	DoctorID  int32  `json:"doctor_id"`
+	StartTime string `json:"start_time"`
+	EndTime   string `json:"end_time"`
+}
+
+// Appointment implements Appointment schema.
+type Appointment struct {
+	ID                int32  `json:"id"`
+	PatientID         int32  `json:"patient_id"`
+	DoctorID          int32  `json:"doctor_id"`
+	StartTime         string `json:"start_time"`
+	EndTime           string `json:"end_time"`
+	ApprovedByPatient bool   `json:"approved_by_patient"`
+	Visited           bool   `json:"visited"`
+
 }
