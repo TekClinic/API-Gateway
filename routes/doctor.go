@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-const d_resourceName = "doctor"
+const dResourceName = "doctor"
 
 type DoctorsParams struct {
 	Skip  int32 `form:"skip,default=0"`
@@ -45,7 +45,7 @@ func getDoctors(service doctors.DoctorServiceClient) gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK,
-			CreateNamedAPIResourceList(ctx, d_resourceName,
+			CreateNamedAPIResourceList(ctx, dResourceName,
 				params.Skip, params.Limit, response.GetCount(), response.GetResults()))
 	}
 }
@@ -92,7 +92,7 @@ func getDoctor(service doctors.DoctorServiceClient) gin.HandlerFunc {
 }
 
 func RegisterDoctorRoutes(router *gin.Engine) {
-	doctorsService, err := ms.FetchServiceParameters(d_resourceName)
+	doctorsService, err := ms.FetchServiceParameters(dResourceName)
 	if err != nil {
 		log.Fatal(err)
 	}
