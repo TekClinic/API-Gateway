@@ -78,6 +78,11 @@ func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 			return
 		}
 
+		languages := response.GetLanguages()
+		if languages == nil {
+			languages = []string{}
+		}
+
 		ctx.JSON(http.StatusOK,
 			schemas.Patient{
 				PatientBase: schemas.PatientBase{
@@ -88,7 +93,7 @@ func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 					},
 					Gender:      strings.ToLower(response.GetGender().String()),
 					PhoneNumber: response.GetPhoneNumber(),
-					Languages:   response.GetLanguages(),
+					Languages:   languages,
 					BirthDate:   response.GetBirthDate(),
 					EmergencyContacts: sf.Map(response.GetEmergencyContacts(),
 						func(contact *patients.Patient_EmergencyContact) schemas.EmergencyContact {
