@@ -164,7 +164,7 @@ func RegisterPatientRoutes(router *gin.Engine) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	conn, err := grpc.Dial(patientsService.GetAddr(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(patientsService.GetAddr(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}

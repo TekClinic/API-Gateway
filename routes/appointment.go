@@ -282,7 +282,7 @@ func RegisterAppointmentRoutes(router *gin.Engine) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	conn, err := grpc.Dial(appointmentService.GetAddr(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(appointmentService.GetAddr(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
