@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	sf "github.com/sa-/slicefunk"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 // AppointmentIDHolder implements AppointmentIDHolder schema.
@@ -282,7 +281,7 @@ func RegisterAppointmentRoutes(router *gin.Engine) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	conn, err := grpc.NewClient(appointmentService.GetAddr(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(appointmentService.GetAddr(), grpc.WithTransportCredentials(GetTransportCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}

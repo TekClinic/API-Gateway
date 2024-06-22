@@ -13,7 +13,6 @@ import (
 	patients "github.com/TekClinic/Patients-MicroService/patients_protobuf"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 const resourceName = "patient"
@@ -164,7 +163,7 @@ func RegisterPatientRoutes(router *gin.Engine) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	conn, err := grpc.NewClient(patientsService.GetAddr(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(patientsService.GetAddr(), grpc.WithTransportCredentials(GetTransportCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
