@@ -15,10 +15,11 @@ COPY go.mod .
 COPY go.sum .
 
 # Build argument for GitHub token
+ARG GITHUB_ACTOR
 ARG GITHUB_TOKEN
 
 # Set up git configuration to use token for private repo
-RUN git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+RUN git config --global url."https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
 
 # Download Go modules
 RUN go mod download
