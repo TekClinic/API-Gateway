@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-const resourceName = "patient"
+const resourceNamePatient = "patient"
 
 type PatientsParams struct {
 	Skip  int32 `form:"skip,default=0"`
@@ -46,7 +46,7 @@ func getPatients(service patients.PatientsServiceClient) gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK,
-			CreateNamedAPIResourceList(ctx, resourceName,
+			CreateNamedAPIResourceList(ctx, resourceNamePatient,
 				params.Skip, params.Limit, response.GetCount(), response.GetResults()))
 	}
 }
@@ -58,8 +58,8 @@ type PatientParams struct {
 func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// fetch params from the path
-		var params PatientParams
-		err := ctx.ShouldBindUri(&params)
+		var uriParams PatientParams
+		err := ctx.ShouldBindUri(&uriParams)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
 				Message: err.Error(),
@@ -70,7 +70,7 @@ func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 		// call patient microservice
 		response, err := service.GetPatient(ctx, &patients.PatientRequest{
 			Token: ctx.GetString(middlewares.TokenKey),
-			Id:    params.ID,
+			Id:    uriParams.ID,
 		})
 		if err != nil {
 			HandleGRPCError(err, ctx)
@@ -112,11 +112,11 @@ func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 	}
 }
 
-func addPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
+func createPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// fetch params from the body
-		var params schemas.PatientBase
-		err := ctx.ShouldBindJSON(&params)
+		var bodyParams schemas.PatientBase
+		err := ctx.ShouldBindJSON(&bodyParams)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
 				Message: err.Error(),
@@ -127,16 +127,16 @@ func addPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 		// call patient microservice
 		response, err := service.CreatePatient(ctx, &patients.CreatePatientRequest{
 			Token: ctx.GetString(middlewares.TokenKey),
-			Name:  params.Name,
+			Name:  bodyParams.Name,
 			PersonalID: &patients.Patient_PersonalID{
-				Id:   params.PersonalID.ID,
-				Type: params.PersonalID.Type,
+				Id:   bodyParams.PersonalID.ID,
+				Type: bodyParams.PersonalID.Type,
 			},
-			Gender:      patients.Patient_Gender(patients.Patient_Gender_value[strings.ToUpper(params.Gender)]),
-			PhoneNumber: params.PhoneNumber,
-			Languages:   params.Languages,
-			BirthDate:   params.BirthDate,
-			EmergencyContacts: sf.Map(params.EmergencyContacts,
+			Gender:      patients.Patient_Gender(patients.Patient_Gender_value[strings.ToUpper(bodyParams.Gender)]),
+			PhoneNumber: bodyParams.PhoneNumber,
+			Languages:   bodyParams.Languages,
+			BirthDate:   bodyParams.BirthDate,
+			EmergencyContacts: sf.Map(bodyParams.EmergencyContacts,
 				func(contact schemas.EmergencyContact) *patients.Patient_EmergencyContact {
 					return &patients.Patient_EmergencyContact{
 						Name:      contact.Name,
@@ -144,8 +144,8 @@ func addPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 						Phone:     contact.Phone,
 					}
 				}),
-			ReferredBy:  params.ReferredBy,
-			SpecialNote: params.SpecialNote,
+			ReferredBy:  bodyParams.ReferredBy,
+			SpecialNote: bodyParams.SpecialNote,
 		})
 		if err != nil {
 			HandleGRPCError(err, ctx)
@@ -159,7 +159,7 @@ func addPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 }
 
 func RegisterPatientRoutes(router *gin.Engine) {
-	patientsService, err := ms.FetchServiceParameters(resourceName)
+	patientsService, err := ms.FetchServiceParameters(resourceNamePatient)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -169,6 +169,6 @@ func RegisterPatientRoutes(router *gin.Engine) {
 	}
 	client := patients.NewPatientsServiceClient(conn)
 	router.GET("/patient", getPatients(client))
-	router.POST("/patient", addPatient(client))
+	router.POST("/patient", createPatient(client))
 	router.GET("/patient/:id", getPatient(client))
 }
