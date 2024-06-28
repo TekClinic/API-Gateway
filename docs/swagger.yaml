@@ -600,11 +600,16 @@ components:
         - approved_by_patient
         - doctor_id
         - end_time
-        - patient_id
+        - id
         - start_time
         - visited
         type: object
         properties:
+          id:
+            type: integer
+            description: identifier of the appointment.
+            format: int32
+            example: 13
           approved_by_patient:
             type: boolean
             description: whether the assigned patient approved that he/she will arrive
