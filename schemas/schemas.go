@@ -48,6 +48,17 @@ type EmergencyContact struct {
 	Phone     string `json:"phone" binding:"required,e164"`
 }
 
+// Doctor implements Doctor schema.
+type Doctor struct {
+	ID           int32    `json:"id"`
+	Active       bool     `json:"active"`
+	Name         string   `json:"name"`
+	Gender       string   `json:"gender"`
+	PhoneNumber  string   `json:"phone_number"`
+	Specialities []string `json:"specialities"`
+	SpecialNote  string   `json:"special_note,omitempty"`
+}
+
 // AppointmentBase implements AppointmentBase schema.
 type AppointmentBase struct {
 	PatientID int32  `json:"patient_id,omitempty"`
