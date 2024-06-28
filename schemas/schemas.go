@@ -42,12 +42,12 @@ type PatientBase struct {
 	Name              string             `json:"name" binding:"required,min=1,max=100"`
 	PersonalID        PersonalID         `json:"personal_id" binding:"required"`
 	Gender            string             `json:"gender" binding:"oneof='unspecified' male female"`
-	PhoneNumber       string             `json:"phone_number" binding:"omitempty,e164"`
+	PhoneNumber       string             `json:"phone_number,omitempty" binding:"omitempty,e164"`
 	Languages         []string           `json:"languages" binding:"max=10"`
 	BirthDate         string             `json:"birth_date" binding:"required,datetime=2006-01-02"`
 	EmergencyContacts []EmergencyContact `json:"emergency_contacts" binding:"max=10,dive"`
-	ReferredBy        string             `json:"referred_by" binding:"max=100"`
-	SpecialNote       string             `json:"special_note" binding:"max=500"`
+	ReferredBy        string             `json:"referred_by,omitempty" binding:"max=100"`
+	SpecialNote       string             `json:"special_note,omitempty" binding:"max=500"`
 }
 
 // Patient implements Patient schema.
@@ -60,7 +60,7 @@ type Patient struct {
 
 // AppointmentBase implements AppointmentBase schema.
 type AppointmentBase struct {
-	PatientID int32  `json:"patient_id"`
+	PatientID int32  `json:"patient_id,omitempty"`
 	DoctorID  int32  `json:"doctor_id"`
 	StartTime string `json:"start_time"`
 	EndTime   string `json:"end_time"`
