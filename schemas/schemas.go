@@ -1,11 +1,5 @@
 package schemas
 
-// NamedAPIResource implements NamedAPIResource schema.
-type NamedAPIResource struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
-}
-
 // NamedAPIResourceList implements NamedAPIResourceList schema.
 type NamedAPIResourceList struct {
 	Count    int32              `json:"count"`
@@ -14,27 +8,10 @@ type NamedAPIResourceList struct {
 	Results  []NamedAPIResource `json:"results"`
 }
 
-// ErrorResponse implements ErrorResponse schema.
-type ErrorResponse struct {
-	Message string `json:"message"`
-}
-
-// PersonalID implements PersonalID schema.
-type PersonalID struct {
-	ID   string `json:"id" binding:"required,min=1,max=100"`
-	Type string `json:"type" binding:"required,min=1,max=100"`
-}
-
-// EmergencyContact implements EmergencyContact schema.
-type EmergencyContact struct {
-	Name      string `json:"name" binding:"required,min=1,max=100"`
-	Closeness string `json:"closeness" binding:"required,min=1,max=100"`
-	Phone     string `json:"phone" binding:"required,e164"`
-}
-
-// IDHolder implements IDHolder schema.
-type IDHolder struct {
-	ID int32 `json:"id"`
+// NamedAPIResource implements NamedAPIResource schema.
+type NamedAPIResource struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
 // PatientBase implements PatientBase schema.
@@ -58,21 +35,46 @@ type Patient struct {
 	Age    int32 `json:"age"`
 }
 
+// PersonalID implements PersonalID schema.
+type PersonalID struct {
+	ID   string `json:"id" binding:"required,min=1,max=100"`
+	Type string `json:"type" binding:"required,min=1,max=100"`
+}
+
+// EmergencyContact implements EmergencyContact schema.
+type EmergencyContact struct {
+	Name      string `json:"name" binding:"required,min=1,max=100"`
+	Closeness string `json:"closeness" binding:"required,min=1,max=100"`
+	Phone     string `json:"phone" binding:"required,e164"`
+}
+
 // AppointmentBase implements AppointmentBase schema.
 type AppointmentBase struct {
 	PatientID int32  `json:"patient_id,omitempty"`
-	DoctorID  int32  `json:"doctor_id"`
-	StartTime string `json:"start_time"`
-	EndTime   string `json:"end_time"`
+	DoctorID  int32  `json:"doctor_id" binding:"required"`
+	StartTime string `json:"start_time" binding:"required,datetime=2006-01-02T15:04:05Z07:00"`
+	EndTime   string `json:"end_time" binding:"required,datetime=2006-01-02T15:04:05Z07:00"`
 }
 
 // Appointment implements Appointment schema.
 type Appointment struct {
-	ID                int32  `json:"id"`
-	PatientID         int32  `json:"patient_id"`
-	DoctorID          int32  `json:"doctor_id"`
-	StartTime         string `json:"start_time"`
-	EndTime           string `json:"end_time"`
-	ApprovedByPatient bool   `json:"approved_by_patient"`
-	Visited           bool   `json:"visited"`
+	AppointmentBase
+	ID                int32 `json:"id"`
+	ApprovedByPatient bool  `json:"approved_by_patient"`
+	Visited           bool  `json:"visited"`
+}
+
+// IDHolder implements IDHolder schema.
+type IDHolder struct {
+	ID int32 `json:"id" binding:"required"`
+}
+
+// PatientIDHolder implements PatientIDHolder schema.
+type PatientIDHolder struct {
+	PatientID int32 `json:"patient_id" binding:"required"`
+}
+
+// ErrorResponse implements ErrorResponse schema.
+type ErrorResponse struct {
+	Message string `json:"message"`
 }

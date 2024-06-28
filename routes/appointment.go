@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -10,58 +9,8 @@ import (
 	appointments "github.com/TekClinic/Appointments-MicroService/appointments_protobuf"
 	ms "github.com/TekClinic/MicroService-Lib"
 	"github.com/gin-gonic/gin"
-	sf "github.com/sa-/slicefunk"
 	"google.golang.org/grpc"
 )
-
-// AppointmentIDHolder implements AppointmentIDHolder schema.
-type AppointmentIDHolder struct {
-	ID int32 `json:"id"`
-}
-
-// PatientIDHolder implements PatientIDHolder schema.
-type PatientIDHolder struct {
-	ID int32 `json:"id"`
-}
-
-// AssignPatientIDHolder PatientIDHolder implements PatientIDHolder schema.
-type AssignPatientIDHolder struct {
-	ID int32 `json:"patient_id"`
-}
-
-// DeletedMessageHolder implements DeletedMessageHolder schema.
-type DeletedMessageHolder struct {
-	Message string `json:"message"`
-}
-
-// CreateAppointmentAPIResourceList creates AppointmentAPIResourceList for the given request.
-func CreateAppointmentAPIResourceList(ctx *gin.Context, resourceName string,
-	count int32, ids []int32) schemas.NamedAPIResourceList {
-	var previous, next *string
-	previousString := "previous"
-	previous = &previousString
-	nextString := "next"
-	next = &nextString
-	return schemas.NamedAPIResourceList{
-		Count:    count,
-		Next:     next,
-		Previous: previous,
-		Results: sf.Map(ids, func(id int32) schemas.NamedAPIResource {
-			return CreateAppointmentAPIResource(ctx, resourceName, id)
-		}),
-	}
-}
-
-// CreateAppointmentAPIResource creates AppointmentAPIResource for resourceName with given id.
-func CreateAppointmentAPIResource(ctx *gin.Context, resourceName string, id int32) schemas.NamedAPIResource {
-	requestURL := retrieveRequestURL(ctx)
-	requestURL.RawQuery = ""
-	requestURL.Path = fmt.Sprintf("/%s/%d", resourceName, id)
-	return schemas.NamedAPIResource{
-		Name: resourceName,
-		URL:  requestURL.String(),
-	}
-}
 
 const resourceNameAppointment = "appointment"
 
@@ -99,8 +48,8 @@ func getAppointments(service appointments.AppointmentsServiceClient) gin.Handler
 		}
 
 		ctx.JSON(http.StatusOK,
-			CreateAppointmentAPIResourceList(ctx, resourceNameAppointment,
-				response.GetCount(), response.GetResults()))
+			CreateNamedAPIResourceList(ctx, resourceNameAppointment,
+				params.Skip, params.Limit, response.GetCount(), response.GetResults()))
 	}
 }
 
@@ -110,8 +59,8 @@ type AppointmentParams struct {
 
 func getAppointment(service appointments.AppointmentsServiceClient) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var params AppointmentParams
-		err := ctx.ShouldBindUri(&params)
+		var uriParams AppointmentParams
+		err := ctx.ShouldBindUri(&uriParams)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
 				Message: err.Error(),
@@ -122,30 +71,31 @@ func getAppointment(service appointments.AppointmentsServiceClient) gin.HandlerF
 		// call appointment microservice
 		response, err := service.GetAppointment(ctx, &appointments.GetAppointmentRequest{
 			Token: ctx.GetString(middlewares.TokenKey),
-			Id:    params.ID,
+			Id:    uriParams.ID,
 		})
 		if err != nil {
 			HandleGRPCError(err, ctx)
 			return
 		}
 
-		ctx.JSON(http.StatusOK,
-			schemas.Appointment{
-				ID:                response.GetId(),
-				PatientID:         response.GetPatientId(),
-				DoctorID:          response.GetDoctorId(),
-				StartTime:         response.GetStartTime(),
-				EndTime:           response.GetEndTime(),
-				ApprovedByPatient: response.GetApprovedByPatient(),
-				Visited:           response.GetVisited(),
-			})
+		ctx.JSON(http.StatusOK, schemas.Appointment{
+			AppointmentBase: schemas.AppointmentBase{
+				PatientID: response.GetPatientId(),
+				DoctorID:  response.GetDoctorId(),
+				StartTime: response.GetStartTime(),
+				EndTime:   response.GetEndTime(),
+			},
+			ID:                response.GetId(),
+			ApprovedByPatient: response.GetApprovedByPatient(),
+			Visited:           response.GetVisited(),
+		})
 	}
 }
 
 func createAppointment(service appointments.AppointmentsServiceClient) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var params schemas.AppointmentBase
-		err := ctx.ShouldBindJSON(&params)
+		var bodyParams schemas.AppointmentBase
+		err := ctx.ShouldBindJSON(&bodyParams)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
 				Message: err.Error(),
@@ -156,40 +106,39 @@ func createAppointment(service appointments.AppointmentsServiceClient) gin.Handl
 		// call appointment microservice
 		response, err := service.CreateAppointment(ctx, &appointments.CreateAppointmentRequest{
 			Token:     ctx.GetString(middlewares.TokenKey),
-			PatientId: params.PatientID,
-			DoctorId:  params.DoctorID,
-			StartTime: params.StartTime,
-			EndTime:   params.EndTime,
+			PatientId: bodyParams.PatientID,
+			DoctorId:  bodyParams.DoctorID,
+			StartTime: bodyParams.StartTime,
+			EndTime:   bodyParams.EndTime,
 		})
 		if err != nil {
 			HandleGRPCError(err, ctx)
 			return
 		}
 
-		ctx.JSON(http.StatusCreated,
-			AppointmentIDHolder{
-				ID: response.GetId(),
-			})
+		ctx.JSON(http.StatusCreated, schemas.IDHolder{
+			ID: response.GetId(),
+		})
 	}
 }
 
 type AssignPatientParams struct {
-	AppointmentID int32 `uri:"id" binding:"required"`
+	ID int32 `uri:"id" binding:"required"`
 }
 
 func assignPatient(service appointments.AppointmentsServiceClient) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var uriParams AssignPatientParams
-		uriErr := ctx.ShouldBindUri(&uriParams)
-		if uriErr != nil {
+		err := ctx.ShouldBindUri(&uriParams)
+		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
-				Message: uriErr.Error(),
+				Message: err.Error(),
 			})
 			return
 		}
-		// Not sure about the binding here
-		var params AssignPatientIDHolder
-		err := ctx.ShouldBindJSON(&params)
+
+		var bodyParams schemas.PatientIDHolder
+		err = ctx.ShouldBindJSON(&bodyParams)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
 				Message: err.Error(),
@@ -200,18 +149,17 @@ func assignPatient(service appointments.AppointmentsServiceClient) gin.HandlerFu
 		// call appointment microservice
 		response, err := service.AssignPatient(ctx, &appointments.AssignPatientRequest{
 			Token:         ctx.GetString(middlewares.TokenKey),
-			AppointmentId: uriParams.AppointmentID,
-			PatientId:     params.ID,
+			AppointmentId: uriParams.ID,
+			PatientId:     bodyParams.PatientID,
 		})
 		if err != nil {
 			HandleGRPCError(err, ctx)
 			return
 		}
 
-		ctx.JSON(http.StatusOK,
-			PatientIDHolder{
-				ID: response.GetPatientId(),
-			})
+		ctx.JSON(http.StatusOK, schemas.PatientIDHolder{
+			PatientID: response.GetPatientId(),
+		})
 	}
 }
 
@@ -221,8 +169,8 @@ type RemovePatientParams struct {
 
 func removePatient(service appointments.AppointmentsServiceClient) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var params RemovePatientParams
-		err := ctx.ShouldBindUri(&params)
+		var uriParams RemovePatientParams
+		err := ctx.ShouldBindUri(&uriParams)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
 				Message: err.Error(),
@@ -233,17 +181,16 @@ func removePatient(service appointments.AppointmentsServiceClient) gin.HandlerFu
 		// call appointment microservice
 		response, err := service.RemovePatient(ctx, &appointments.RemovePatientRequest{
 			Token:         ctx.GetString(middlewares.TokenKey),
-			AppointmentId: params.ID,
+			AppointmentId: uriParams.ID,
 		})
 		if err != nil {
 			HandleGRPCError(err, ctx)
 			return
 		}
 
-		ctx.JSON(http.StatusOK,
-			PatientIDHolder{
-				ID: response.GetPatientId(),
-			})
+		ctx.JSON(http.StatusOK, schemas.PatientIDHolder{
+			PatientID: response.GetPatientId(),
+		})
 	}
 }
 
@@ -253,8 +200,8 @@ type DeleteAppointmentParams struct {
 
 func deleteAppointment(service appointments.AppointmentsServiceClient) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var params DeleteAppointmentParams
-		err := ctx.ShouldBindUri(&params)
+		var uriParams DeleteAppointmentParams
+		err := ctx.ShouldBindUri(&uriParams)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
 				Message: err.Error(),
@@ -265,7 +212,7 @@ func deleteAppointment(service appointments.AppointmentsServiceClient) gin.Handl
 		// call appointment microservice
 		_, err = service.DeleteAppointment(ctx, &appointments.DeleteAppointmentRequest{
 			Token:         ctx.GetString(middlewares.TokenKey),
-			AppointmentId: params.ID,
+			AppointmentId: uriParams.ID,
 		})
 		if err != nil {
 			HandleGRPCError(err, ctx)
