@@ -90,6 +90,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Patient'
+    delete:
+      tags:
+        - Patient
+      description: deletes a patient
+      operationId: deletePatient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: patient deleted successfully
   /doctor:
     get:
       tags:
