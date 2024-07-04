@@ -37,6 +37,16 @@ paths:
           type: integer
           format: int32
           default: 20
+      - name: search
+        in: query
+        description: Search term for filtering. It searches personal ID, phone number, name, special note, and referred person. All words in the search term must appear in one of the fields as a prefix.
+        required: false
+        style: form
+        explode: true
+        schema:
+          maxLength: 100
+          minLength: 1
+          type: string
       responses:
         "200":
           description: all the patients
@@ -46,7 +56,7 @@ paths:
                 $ref: '#/components/schemas/NamedAPIResourceList'
               example:
                 count: 248
-                next: http://api.tekclinic.org/patient/?limit=20&offset=20
+                next: http://api.tekclinic.org/patient/?limit=20&offset=20&search=john
                 results:
                 - name: patient
                   url: http://api.tekclinic.org/patient/1/
@@ -120,6 +130,16 @@ paths:
           type: integer
           format: int32
           default: 20
+      - name: search
+        in: query
+        description: Search term for filtering. It searches name, phone number, specialities and special note. All words in the search term must appear in one of the fields as a prefix.
+        required: false
+        style: form
+        explode: true
+        schema:
+          maxLength: 100
+          minLength: 1
+          type: string
       responses:
         "200":
           description: all the doctors
