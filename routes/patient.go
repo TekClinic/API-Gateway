@@ -35,7 +35,7 @@ func getPatients(service patients.PatientsServiceClient) gin.HandlerFunc {
 		}
 
 		// call patient microservice
-		response, err := service.GetPatientsIDs(ctx, &patients.PatientsRequest{
+		response, err := service.GetPatientsIDs(ctx, &patients.GetPatientsIDsRequest{
 			Token:  ctx.GetString(middlewares.TokenKey),
 			Limit:  params.Limit,
 			Offset: params.Skip,
@@ -68,7 +68,7 @@ func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 		}
 
 		// call patient microservice
-		response, err := service.GetPatient(ctx, &patients.PatientRequest{
+		response, err := service.GetPatient(ctx, &patients.GetPatientRequest{
 			Token: ctx.GetString(middlewares.TokenKey),
 			Id:    uriParams.ID,
 		})
@@ -77,7 +77,16 @@ func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 			return
 		}
 
-		languages := response.GetLanguages()
+		if response.GetPatient() == nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, schemas.ErrorResponse{
+				Message: "Invalid response from the server.",
+			})
+			return
+		}
+
+		patient := response.GetPatient()
+
+		languages := patient.GetLanguages()
 		if languages == nil {
 			languages = []string{}
 		}
@@ -85,16 +94,16 @@ func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 		ctx.JSON(http.StatusOK,
 			schemas.Patient{
 				PatientBase: schemas.PatientBase{
-					Name: response.GetName(),
+					Name: patient.GetName(),
 					PersonalID: schemas.PersonalID{
-						ID:   response.GetPersonalId().GetId(),
-						Type: response.GetPersonalId().GetType(),
+						ID:   patient.GetPersonalId().GetId(),
+						Type: patient.GetPersonalId().GetType(),
 					},
-					Gender:      strings.ToLower(response.GetGender().String()),
-					PhoneNumber: response.GetPhoneNumber(),
+					Gender:      strings.ToLower(patient.GetGender().String()),
+					PhoneNumber: patient.GetPhoneNumber(),
 					Languages:   languages,
-					BirthDate:   response.GetBirthDate(),
-					EmergencyContacts: sf.Map(response.GetEmergencyContacts(),
+					BirthDate:   patient.GetBirthDate(),
+					EmergencyContacts: sf.Map(patient.GetEmergencyContacts(),
 						func(contact *patients.Patient_EmergencyContact) schemas.EmergencyContact {
 							return schemas.EmergencyContact{
 								Name:      contact.GetName(),
@@ -102,12 +111,12 @@ func getPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 								Phone:     contact.GetPhone(),
 							}
 						}),
-					ReferredBy:  response.GetReferredBy(),
-					SpecialNote: response.GetSpecialNote(),
+					ReferredBy:  patient.GetReferredBy(),
+					SpecialNote: patient.GetSpecialNote(),
 				},
-				ID:     response.GetId(),
-				Active: response.GetActive(),
-				Age:    response.GetAge(),
+				ID:     patient.GetId(),
+				Active: patient.GetActive(),
+				Age:    patient.GetAge(),
 			})
 	}
 }
@@ -128,7 +137,7 @@ func createPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 		response, err := service.CreatePatient(ctx, &patients.CreatePatientRequest{
 			Token: ctx.GetString(middlewares.TokenKey),
 			Name:  bodyParams.Name,
-			PersonalID: &patients.Patient_PersonalID{
+			PersonalId: &patients.Patient_PersonalID{
 				Id:   bodyParams.PersonalID.ID,
 				Type: bodyParams.PersonalID.Type,
 			},
