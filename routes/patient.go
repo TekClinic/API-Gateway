@@ -167,6 +167,32 @@ func createPatient(service patients.PatientsServiceClient) gin.HandlerFunc {
 	}
 }
 
+func deletePatient(service patients.PatientsServiceClient) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// fetch params from the path
+		var uriParams PatientParams
+		err := ctx.ShouldBindUri(&uriParams)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
+				Message: err.Error(),
+			})
+			return
+		}
+
+		// call patient microservice
+		_, err = service.DeletePatient(ctx, &patients.DeletePatientRequest{
+			Token: ctx.GetString(middlewares.TokenKey),
+			Id:    uriParams.ID,
+		})
+		if err != nil {
+			HandleGRPCError(err, ctx)
+			return
+		}
+
+		ctx.Status(http.StatusOK)
+	}
+}
+
 func RegisterPatientRoutes(router *gin.Engine) {
 	patientsService, err := ms.FetchServiceParameters(resourceNamePatient)
 	if err != nil {
@@ -180,4 +206,5 @@ func RegisterPatientRoutes(router *gin.Engine) {
 	router.GET("/patient", getPatients(client))
 	router.POST("/patient", createPatient(client))
 	router.GET("/patient/:id", getPatient(client))
+	router.DELETE("/patient/:id", deletePatient(client))
 }
