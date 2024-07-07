@@ -32,7 +32,7 @@ func getDoctors(service doctors.DoctorsServiceClient) gin.HandlerFunc {
 			return
 		}
 
-		// call patient microservice
+		// call doctor microservice
 		response, err := service.GetDoctorsIDs(ctx, &doctors.GetDoctorsIDsRequest{
 			Token:  ctx.GetString(middlewares.TokenKey),
 			Limit:  params.Limit,
@@ -65,7 +65,7 @@ func getDoctor(service doctors.DoctorsServiceClient) gin.HandlerFunc {
 			return
 		}
 
-		// call patient microservice
+		// call doctor microservice
 		response, err := service.GetDoctor(ctx, &doctors.GetDoctorRequest{
 			Token: ctx.GetString(middlewares.TokenKey),
 			Id:    uriParams.ID,
@@ -101,6 +101,32 @@ func getDoctor(service doctors.DoctorsServiceClient) gin.HandlerFunc {
 	}
 }
 
+func deleteDoctor(service doctors.DoctorsServiceClient) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// fetch params from the path
+		var uriParams DoctorParams
+		err := ctx.ShouldBindUri(&uriParams)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
+				Message: err.Error(),
+			})
+			return
+		}
+
+		// call doctor microservice
+		_, err = service.DeleteDoctor(ctx, &doctors.DeleteDoctorRequest{
+			Token: ctx.GetString(middlewares.TokenKey),
+			Id:    uriParams.ID,
+		})
+		if err != nil {
+			HandleGRPCError(err, ctx)
+			return
+		}
+
+		ctx.Status(http.StatusOK)
+	}
+}
+
 func RegisterDoctorRoutes(router *gin.Engine) {
 	doctorsService, err := ms.FetchServiceParameters(resourceNameDoctor)
 	if err != nil {
@@ -113,4 +139,5 @@ func RegisterDoctorRoutes(router *gin.Engine) {
 	client := doctors.NewDoctorsServiceClient(conn)
 	router.GET("/doctor", getDoctors(client))
 	router.GET("/doctor/:id", getDoctor(client))
+	router.DELETE("/doctor/:id", deleteDoctor(client))
 }

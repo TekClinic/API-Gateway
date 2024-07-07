@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/TekClinic/Appointments-MicroService/appointments_protobuf v0.1.2
-	github.com/TekClinic/Doctors-MicroService/doctors_protobuf v0.1.3
+	github.com/TekClinic/Doctors-MicroService/doctors_protobuf v0.1.4
 	github.com/TekClinic/MicroService-Lib v0.1.2
 	github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.4
 	github.com/gin-contrib/cors v1.7.2
