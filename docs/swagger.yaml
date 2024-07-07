@@ -171,6 +171,22 @@ paths:
                   url: http://api.tekclinic.org/doctor/1/
                 - name: doctor
                   url: http://api.tekclinic.org/doctor/2/
+    post:
+      tags:
+        - Doctor
+      operationId: createDoctor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoctorBase'
+      responses:
+        "201":
+          description: id of the created doctor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdHolder'
   /doctor/{id}:
     get:
       tags:
@@ -374,7 +390,7 @@ paths:
     delete:
       tags:
       - Appointment
-      description: deassign any patient assigned to the appointment
+      description: unassign any patient assigned to the appointment
       operationId: clearPatientFromAppointment
       parameters:
       - name: id
@@ -566,26 +582,12 @@ components:
           type: string
           description: "phone number of patient, that includes country code."
           example: +972603159352
-    Doctor:
+    DoctorBase:
       required:
-      - active
-      - gender
-      - id
       - name
       - phone_number
-      - specialities
       type: object
       properties:
-        id:
-          type: integer
-          description: identifier of the doctor.
-          format: int32
-          example: 13
-        active:
-          type: boolean
-          description: wether the doctor still works in the clinic.
-          example: true
-          default: true
         name:
           maxLength: 100
           minLength: 1
@@ -608,7 +610,7 @@ components:
         specialities:
           maxItems: 30
           type: array
-          description: pecialities of the doctor.
+          description: specialities of the doctor.
           example:
           - Family
           - OBGYN
@@ -620,6 +622,28 @@ components:
           type: string
           description: additional notes.
           example: Works only with males
+    Doctor:
+      allOf:
+        - required:
+            - active
+            - gender
+            - id
+            - name
+            - phone_number
+            - specialities
+          type: object
+          properties:
+            id:
+              type: integer
+              description: identifier of the doctor.
+              format: int32
+              example: 13
+            active:
+              type: boolean
+              description: whether the doctor still works in the clinic.
+              example: true
+              default: true
+        - $ref: '#/components/schemas/DoctorBase'
     AppointmentBase:
       required:
       - doctor_id
