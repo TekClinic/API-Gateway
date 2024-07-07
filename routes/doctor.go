@@ -90,13 +90,47 @@ func getDoctor(service doctors.DoctorsServiceClient) gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK, schemas.Doctor{
-			ID:           doctor.GetId(),
-			Active:       doctor.GetActive(),
-			Name:         doctor.GetName(),
-			Gender:       strings.ToLower(doctor.GetGender().String()),
-			PhoneNumber:  doctor.GetPhoneNumber(),
-			Specialities: specialities,
-			SpecialNote:  doctor.GetSpecialNote(),
+			DoctorBase: schemas.DoctorBase{
+				Name:         doctor.GetName(),
+				Gender:       strings.ToLower(doctor.GetGender().String()),
+				PhoneNumber:  doctor.GetPhoneNumber(),
+				Specialities: specialities,
+				SpecialNote:  doctor.GetSpecialNote(),
+			},
+			ID:     doctor.GetId(),
+			Active: doctor.GetActive(),
+		})
+	}
+}
+
+func createDoctor(service doctors.DoctorsServiceClient) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// fetch params from the body
+		var bodyParams schemas.DoctorBase
+		err := ctx.ShouldBindJSON(&bodyParams)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
+				Message: err.Error(),
+			})
+			return
+		}
+
+		// call doctor microservice
+		response, err := service.CreateDoctor(ctx, &doctors.CreateDoctorRequest{
+			Token:        ctx.GetString(middlewares.TokenKey),
+			Name:         bodyParams.Name,
+			Gender:       doctors.Doctor_Gender(doctors.Doctor_Gender_value[strings.ToUpper(bodyParams.Gender)]),
+			PhoneNumber:  bodyParams.PhoneNumber,
+			Specialities: bodyParams.Specialities,
+			SpecialNote:  bodyParams.SpecialNote,
+		})
+		if err != nil {
+			HandleGRPCError(err, ctx)
+			return
+		}
+
+		ctx.JSON(http.StatusCreated, schemas.IDHolder{
+			ID: response.GetId(),
 		})
 	}
 }
@@ -138,6 +172,7 @@ func RegisterDoctorRoutes(router *gin.Engine) {
 	}
 	client := doctors.NewDoctorsServiceClient(conn)
 	router.GET("/doctor", getDoctors(client))
+	router.POST("/doctor", createDoctor(client))
 	router.GET("/doctor/:id", getDoctor(client))
 	router.DELETE("/doctor/:id", deleteDoctor(client))
 }
