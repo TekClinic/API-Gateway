@@ -111,6 +111,18 @@ func HandleGRPCError(err error, ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, schemas.ErrorResponse{
 			Message: "request object is not found",
 		})
+	case codes.InvalidArgument:
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Message: "invalid request object",
+		})
+	case codes.AlreadyExists:
+		ctx.AbortWithStatusJSON(http.StatusConflict, schemas.ErrorResponse{
+			Message: "request object already exists",
+		})
+	case codes.OutOfRange:
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
+			Message: "request object is out of range",
+		})
 	default:
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, schemas.ErrorResponse{
 			Message: fmt.Sprintf("unknown error occurred: %s", err.Error()),
