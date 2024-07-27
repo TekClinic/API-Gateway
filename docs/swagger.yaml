@@ -340,6 +340,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Appointment'
+    put:
+      tags:
+      - Appointment
+      description: updates a specific appointment
+      operationId: updateAppointment
+      parameters:
+      - name: id
+        in: path
+        description: id of the appointment to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentEdit'
+      responses:
+        "200":
+          description: id of the updated appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdHolder'
     delete:
       tags:
       - Appointment
@@ -697,6 +724,45 @@ components:
             type: boolean
             description: whether the assigned patient come to the appointment
             default: false
+    AppointmentEdit:
+      required:
+      - patient_id
+      - doctor_id
+      - end_time
+      - start_time
+      - approved_by_patient
+      - visited
+      type: object
+      properties:
+        patient_id:
+          type: integer
+          description: patient assigned to the appointment
+          format: int32
+          example: 123
+        doctor_id:
+          type: integer
+          description: doctor assigned to the appointment
+          format: int32
+          example: 11
+        start_time:
+          type: string
+          description: start time of the appointment
+          format: date-time
+          example: 2024-03-20T14:30:00Z
+        end_time:
+          type: string
+          description: end time of the appointment
+          format: date-time
+          example: 2024-03-20T15:30:00Z
+        approved_by_patient:
+          type: boolean
+          description: whether the assigned patient approved that he/she will arrive
+          example: true
+          default: false
+        visited:
+          type: boolean
+          description: whether the assigned patient come to the appointment
+          default: false
     IdHolder:
       required:
       - id
