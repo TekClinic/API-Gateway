@@ -340,6 +340,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Appointment'
+    put:
+      tags:
+      - Appointment
+      description: updates a specific appointment
+      operationId: updateAppointment
+      parameters:
+      - name: id
+        in: path
+        description: id of the appointment to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentEdit'
+      responses:
+        "200":
+          description: id of the updated appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdHolder'
     delete:
       tags:
       - Appointment
@@ -688,6 +715,27 @@ components:
             description: identifier of the appointment.
             format: int32
             example: 13
+          approved_by_patient:
+            type: boolean
+            description: whether the assigned patient approved that he/she will arrive
+            example: true
+            default: false
+          visited:
+            type: boolean
+            description: whether the assigned patient come to the appointment
+            default: false
+    AppointmentEdit:
+      allOf:
+      - $ref: '#/components/schemas/AppointmentBase'
+      - required:
+        - patient_id
+        - doctor_id
+        - end_time
+        - start_time
+        - approved_by_patient
+        - visited
+        type: object
+        properties:
           approved_by_patient:
             type: boolean
             description: whether the assigned patient approved that he/she will arrive
