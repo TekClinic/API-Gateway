@@ -16,8 +16,9 @@ import (
 const resourceNameDoctor = "doctor"
 
 type DoctorsParams struct {
-	Skip  int32 `form:"skip,default=0"`
-	Limit int32 `form:"limit,default=20"`
+	Skip   int32  `form:"skip,default=0"`
+	Limit  int32  `form:"limit,default=20"`
+	Search string `form:"search" binding:"omitempty,min=1,max=100"`
 }
 
 func getDoctors(service doctors.DoctorsServiceClient) gin.HandlerFunc {
@@ -37,6 +38,7 @@ func getDoctors(service doctors.DoctorsServiceClient) gin.HandlerFunc {
 			Token:  ctx.GetString(middlewares.TokenKey),
 			Limit:  params.Limit,
 			Offset: params.Skip,
+			Search: params.Search,
 		})
 		if err != nil {
 			HandleGRPCError(err, ctx)
