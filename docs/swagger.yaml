@@ -367,6 +367,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdHolder'
+    put:
+      tags:
+      - Appointment
+      description: updates a specific appointment
+      operationId: updateAppointment
+      parameters:
+      - name: id
+        in: path
+        description: id of the appointment to be updated
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentEdit'
+      responses:
+        "200":
+          description: id of the updated appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdHolder'
     delete:
       tags:
       - Appointment
