@@ -223,6 +223,52 @@ func deleteAppointment(service appointments.AppointmentsServiceClient) gin.Handl
 	}
 }
 
+type EditAppointmentParams struct {
+	ID int32 `uri:"id" binding:"required"`
+}
+
+func editAppointment(service appointments.AppointmentsServiceClient) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var uriParams EditAppointmentParams
+		err := ctx.ShouldBindUri(&uriParams)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
+				Message: err.Error(),
+			})
+			return
+		}
+
+		var bodyParams schemas.AppointmentEdit
+		err = ctx.ShouldBindJSON(&bodyParams)
+		if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, schemas.ErrorResponse{
+				Message: err.Error(),
+			})
+			return
+		}
+
+		// call appointment microservice
+		response, err := service.EditAppointment(ctx, &appointments.EditAppointmentRequest{
+			Token:             ctx.GetString(middlewares.TokenKey),
+			AppointmentId:     uriParams.ID,
+			PatientId:         bodyParams.PatientID,
+			DoctorId:          bodyParams.DoctorID,
+			StartTime:         bodyParams.StartTime,
+			EndTime:           bodyParams.EndTime,
+			ApprovedByPatient: bodyParams.ApprovedByPatient,
+			Visited:           bodyParams.Visited,
+		})
+		if err != nil {
+			HandleGRPCError(err, ctx)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, schemas.IDHolder{
+			ID: response.GetAppointmentId(),
+		})
+	}
+}
+
 func RegisterAppointmentRoutes(router *gin.Engine) {
 	appointmentService, err := ms.FetchServiceParameters(resourceNameAppointment)
 	if err != nil {
@@ -240,4 +286,5 @@ func RegisterAppointmentRoutes(router *gin.Engine) {
 	router.PUT("/appointment/:id/patient", assignPatient(client))
 	router.DELETE("/appointment/:id/patient", removePatient(client))
 	router.DELETE("/appointment/:id", deleteAppointment(client))
+	router.PUT("/appointment/:id", editAppointment(client))
 }

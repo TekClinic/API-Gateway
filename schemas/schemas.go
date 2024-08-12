@@ -79,6 +79,13 @@ type Appointment struct {
 	Visited           bool  `json:"visited"`
 }
 
+// AppointmentEdit implements Appointment schema.
+type AppointmentEdit struct {
+	AppointmentBase
+	ApprovedByPatient bool `json:"approved_by_patient"`
+	Visited           bool `json:"visited"`
+}
+
 // IDHolder implements IDHolder schema.
 type IDHolder struct {
 	ID int32 `json:"id" binding:"required"`
