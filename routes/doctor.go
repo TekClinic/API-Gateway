@@ -4,14 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	"go.uber.org/zap"
-
 	"github.com/TekClinic/API-Gateway/middlewares"
 	"github.com/TekClinic/API-Gateway/schemas"
 	doctors "github.com/TekClinic/Doctors-MicroService/doctors_protobuf"
-	ms "github.com/TekClinic/MicroService-Lib"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/grpc"
 )
 
 const resourceNameDoctor = "doctor"
@@ -165,17 +161,17 @@ func deleteDoctor(service doctors.DoctorsServiceClient) gin.HandlerFunc {
 }
 
 func RegisterDoctorRoutes(router *gin.Engine) {
-	doctorsService, err := ms.FetchServiceParameters(resourceNameDoctor)
-	if err != nil {
-		zap.L().Fatal("Failed to fetch service parameters", zap.Error(err))
-	}
-	conn, err := grpc.NewClient(doctorsService.GetAddr(), ms.GetGRPCClientOptions()...)
-	if err != nil {
-		zap.L().Fatal("Failed to create gRPC client", zap.Error(err))
-	}
-	client := doctors.NewDoctorsServiceClient(conn)
+	client := InitiateClient(resourceNameDoctor, doctors.NewDoctorsServiceClient)
+
+	// deprecated
 	router.GET("/doctor", getDoctors(client))
 	router.POST("/doctor", createDoctor(client))
 	router.GET("/doctor/:id", getDoctor(client))
 	router.DELETE("/doctor/:id", deleteDoctor(client))
+	// end deprecated
+
+	router.GET("/doctors", getDoctors(client))
+	router.POST("/doctors", createDoctor(client))
+	router.GET("/doctors/:id", getDoctor(client))
+	router.DELETE("/doctors/:id", deleteDoctor(client))
 }

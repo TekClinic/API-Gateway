@@ -6,6 +6,10 @@ import (
 	"net/url"
 	"strconv"
 
+	ms "github.com/TekClinic/MicroService-Lib"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+
 	"github.com/gin-contrib/location"
 
 	"github.com/TekClinic/API-Gateway/schemas"
@@ -40,6 +44,7 @@ func CreateNamedAPIResource(ctx *gin.Context, resourceName string, id int32) sch
 	requestURL.RawQuery = ""
 	requestURL.Path = fmt.Sprintf("/%s/%d", resourceName, id)
 	return schemas.NamedAPIResource{
+		ID:   id,
 		Name: resourceName,
 		URL:  requestURL.String(),
 	}
@@ -88,6 +93,20 @@ func UnImplemented() gin.HandlerFunc {
 			Message: "endpoint is not yet implemented",
 		})
 	}
+}
+
+// InitiateClient creates a gRPC client for the given resource.
+func InitiateClient[T any](resourceName string, clientCreator func(grpc.ClientConnInterface) T) T {
+	service, err := ms.FetchServiceParameters(resourceName)
+	if err != nil {
+		zap.L().Fatal("Failed to fetch service parameters", zap.Error(err))
+	}
+	conn, err := grpc.NewClient(service.GetAddr(), ms.GetGRPCClientOptions()...)
+	if err != nil {
+		zap.L().Fatal("Failed to create gRPC client", zap.Error(err))
+	}
+	client := clientCreator(conn)
+	return client
 }
 
 // HandleGRPCError ends connection with a relevant status code and message.

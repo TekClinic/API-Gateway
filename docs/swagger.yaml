@@ -7,7 +7,7 @@ info:
 servers:
 - url: /
 paths:
-  /patient:
+  /patients:
     get:
       tags:
       - Patient
@@ -56,12 +56,14 @@ paths:
                 $ref: '#/components/schemas/NamedAPIResourceList'
               example:
                 count: 248
-                next: http://api.tekclinic.org/patient/?limit=20&offset=20&search=john
+                next: http://api.tekclinic.org/patients/?limit=20&offset=20&search=john
                 results:
-                - name: patient
-                  url: http://api.tekclinic.org/patient/1/
-                - name: patient
-                  url: http://api.tekclinic.org/patient/2/
+                - id: 1
+                  name: patient
+                  url: http://api.tekclinic.org/patients/1/
+                - id: 2
+                  name: patient
+                  url: http://api.tekclinic.org/patients/2/
     post:
       tags:
       - Patient
@@ -78,7 +80,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdHolder'
-  /patient/{id}:
+  /patients/{id}:
     get:
       tags:
       - Patient
@@ -117,7 +119,7 @@ paths:
       responses:
         "200":
           description: patient deleted successfully
-  /doctor:
+  /doctors:
     get:
       tags:
       - Doctor
@@ -167,10 +169,12 @@ paths:
               example:
                 count: 12
                 results:
-                - name: doctor
-                  url: http://api.tekclinic.org/doctor/1/
-                - name: doctor
-                  url: http://api.tekclinic.org/doctor/2/
+                - id: 1
+                  name: doctor
+                  url: http://api.tekclinic.org/doctors/1/
+                - id: 2
+                  name: doctor
+                  url: http://api.tekclinic.org/doctors/2/
     post:
       tags:
         - Doctor
@@ -187,7 +191,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdHolder'
-  /doctor/{id}:
+  /doctors/{id}:
     get:
       tags:
       - Doctor
@@ -226,7 +230,7 @@ paths:
       responses:
         "200":
           description: doctor deleted successfully
-  /appointment:
+  /appointments:
     get:
       tags:
       - Appointment
@@ -295,12 +299,14 @@ paths:
                 $ref: '#/components/schemas/NamedAPIResourceList'
               example:
                 count: 12
-                next: http://api.tekclinic.org/appointment/?limit=20&offset=20&date=2024-11-23
+                next: http://api.tekclinic.org/appointments/?limit=20&offset=20&date=2024-11-23
                 results:
-                - name: appointment
-                  url: http://api.tekclinic.org/appointment/23/
-                - name: appointment
-                  url: http://api.tekclinic.org/appointment/122/
+                - id: 23
+                  name: appointment
+                  url: http://api.tekclinic.org/appointments/23/
+                - id: 122
+                  name: appointment
+                  url: http://api.tekclinic.org/appointments/122/
     post:
       tags:
       - Appointment
@@ -318,7 +324,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdHolder'
-  /appointment/{id}:
+  /appointments/{id}:
     get:
       tags:
       - Appointment
@@ -384,7 +390,7 @@ paths:
       responses:
         "200":
           description: appointment delete successfully
-  /appointment/{id}/patient:
+  /appointments/{id}/patient:
     put:
       tags:
       - Appointment
@@ -466,10 +472,15 @@ components:
             $ref: '#/components/schemas/NamedAPIResource'
     NamedAPIResource:
       required:
+      - id
       - name
       - url
       type: object
       properties:
+        id:
+          type: integer
+          description: identifier of the referenced resource.
+          format: int32
         name:
           type: string
           description: type name of the referenced resource.
@@ -477,6 +488,7 @@ components:
           type: string
           description: URL of the referenced resource.
           format: uri
+          deprecated: true
     PatientBase:
       required:
       - birth_date

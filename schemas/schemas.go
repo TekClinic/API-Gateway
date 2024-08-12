@@ -10,6 +10,7 @@ type NamedAPIResourceList struct {
 
 // NamedAPIResource implements NamedAPIResource schema.
 type NamedAPIResource struct {
+	ID   int32  `json:"id"`
 	Name string `json:"name"`
 	URL  string `json:"url"`
 }

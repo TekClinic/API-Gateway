@@ -3,14 +3,10 @@ package routes
 import (
 	"net/http"
 
-	"go.uber.org/zap"
-
 	"github.com/TekClinic/API-Gateway/middlewares"
 	"github.com/TekClinic/API-Gateway/schemas"
 	appointments "github.com/TekClinic/Appointments-MicroService/appointments_protobuf"
-	ms "github.com/TekClinic/MicroService-Lib"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/grpc"
 )
 
 const resourceNameAppointment = "appointment"
@@ -271,16 +267,9 @@ func editAppointment(service appointments.AppointmentsServiceClient) gin.Handler
 }
 
 func RegisterAppointmentRoutes(router *gin.Engine) {
-	appointmentService, err := ms.FetchServiceParameters(resourceNameAppointment)
-	if err != nil {
-		zap.L().Fatal("Failed to fetch service parameters", zap.Error(err))
-	}
-	conn, err := grpc.NewClient(appointmentService.GetAddr(), ms.GetGRPCClientOptions()...)
-	if err != nil {
-		zap.L().Fatal("Failed to create gRPC client", zap.Error(err))
-	}
-	client := appointments.NewAppointmentsServiceClient(conn)
+	client := InitiateClient(resourceNameAppointment, appointments.NewAppointmentsServiceClient)
 
+	// deprecated
 	router.GET("/appointment/:id", getAppointment(client))
 	router.POST("/appointment", createAppointment(client))
 	router.GET("/appointment", getAppointments(client))
@@ -288,4 +277,13 @@ func RegisterAppointmentRoutes(router *gin.Engine) {
 	router.DELETE("/appointment/:id/patient", removePatient(client))
 	router.DELETE("/appointment/:id", deleteAppointment(client))
 	router.PUT("/appointment/:id", editAppointment(client))
+	// end deprecated
+
+	router.GET("/appointments/:id", getAppointment(client))
+	router.POST("/appointments", createAppointment(client))
+	router.GET("/appointments", getAppointments(client))
+	router.PUT("/appointments/:id/patient", assignPatient(client))
+	router.DELETE("/appointments/:id/patient", removePatient(client))
+	router.DELETE("/appointments/:id", deleteAppointment(client))
+	router.PUT("/appointments/:id", editAppointment(client))
 }
