@@ -119,7 +119,7 @@ type TaskBase struct {
   PatientId   int32 `json:"patient_id" binding:"required"`
   Expertise   string `json:"expertise"`
   Title       string `json:"title" binding:"required"`
-  Description string `json:"description" binding:"required"`
+  Description string `json:"description"`
 }
 
 type Task struct {
