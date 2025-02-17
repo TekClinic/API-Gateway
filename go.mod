@@ -7,7 +7,7 @@ require (
 	github.com/TekClinic/Doctors-MicroService/doctors_protobuf v0.1.6
 	github.com/TekClinic/MicroService-Lib v0.1.3
 	github.com/TekClinic/Patients-MicroService/patients_protobuf v0.1.6
-	github.com/TekClinic/Tasks-MicroService/tasks_protobuf v0.1.6
+	github.com/TekClinic/Tasks-MicroService/tasks_protobuf v0.0.0-20250119135522-6ec8b645e4cd
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-contrib/location v1.0.1
 	github.com/gin-contrib/zap v1.1.3
@@ -16,8 +16,6 @@ require (
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.65.0
 )
-
-replace github.com/TekClinic/Tasks-MicroService/tasks_protobuf => github.com/yonatan-reicher/Tasks-MicroService/tasks_protobuf v0.0.0-20250115081633-9cdf8e719c27
 
 require (
 	github.com/alexlast/bunzap v0.1.0 // indirect
