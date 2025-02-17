@@ -114,18 +114,19 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
+// TODO: I do not know how to use these attributes, I am just guessing
 type TaskBase struct {
-	PatientId   int32
-	Expertise   string
-	Title       string
-	Description string
+  PatientId   int32 `json:"patient_id" binding:"required"`
+  Expertise   string `json:"expertise" binding:"required"`
+  Title       string `json:"title" binding:"required"`
+  Description string `json:"description" binding:"required"`
 }
 
 type Task struct {
 	TaskBase
-	Id         int32
-	CreatedAt  string
-	Complete   bool
+  Id         int32 `json:"id" binding:"required"`
+  CreatedAt  string `json:"created_at" binding:"required"`
+  Complete   bool `json:"complete" binding:"required"`
 }
 
 type TaskUpdate struct {
