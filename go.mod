@@ -17,6 +17,8 @@ require (
 	google.golang.org/grpc v1.65.0
 )
 
+replace github.com/TekClinic/Tasks-MicroService/tasks_protobuf => github.com/yonatan-reicher/Tasks-MicroService/tasks_protobuf v0.0.0-20250115081633-9cdf8e719c27
+
 require (
 	github.com/alexlast/bunzap v0.1.0 // indirect
 	github.com/bytedance/sonic v1.12.1 // indirect
