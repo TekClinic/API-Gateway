@@ -117,7 +117,7 @@ type ErrorResponse struct {
 // TODO: I do not know how to use these attributes, I am just guessing
 type TaskBase struct {
   PatientId   int32 `json:"patient_id" binding:"required"`
-  Expertise   string `json:"expertise" binding:"required"`
+  Expertise   string `json:"expertise"`
   Title       string `json:"title" binding:"required"`
   Description string `json:"description" binding:"required"`
 }
